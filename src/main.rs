@@ -1,8 +1,8 @@
 #![allow(unused)] // TODO remove later
 
-use maud_dib::DAFFile;
-
 use crate::prelude::*;
+
+use undaf::DAFFile;
 
 mod error;
 mod prelude;
