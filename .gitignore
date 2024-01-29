@@ -2,3 +2,4 @@
 *.bsp
 *.bpc
 *.ck
+target/
