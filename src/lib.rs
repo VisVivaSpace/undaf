@@ -96,7 +96,7 @@ fn get_string(mut f: &File, offset: u64, maxlen: u64) -> Result<String> {
     Ok(string_out.trim().to_string())
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Endian {
     Big,
     Little,
@@ -192,21 +192,6 @@ impl DAFFile {
                 return Err(Error::Generic(String::from("Unsuported DAF file type")));
             }
         };
-
-        dbg!(&endian);
-        dbg!(&daf_type);
-        dbg!(&nd);
-        dbg!(&ni);
-        dbg!(&sum_size);
-        dbg!(&nc);
-        dbg!(&locifn);
-        dbg!(&fward);
-        dbg!(&bward);
-        dbg!(&free_address);
-        dbg!(&ftpstr);
-        dbg!(&next_record);
-        dbg!(&current_record);
-        dbg!(&nsum);
 
         Ok(DAFFile {
             file,
@@ -328,13 +313,13 @@ impl Iterator for DAFFile {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK1 {
     epochs: Vec<f64>,
     records: Vec<Vec<f64>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK2 {
     init_epoch: f64,
     tstep: f64,
@@ -346,7 +331,7 @@ pub struct SPK2 {
     degree: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK3 {
     init_epoch: f64,
     tstep: f64,
@@ -361,14 +346,14 @@ pub struct SPK3 {
     degree: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK5 {
     gm: f64,
     epochs: Vec<f64>,
     states: Vec<Vec<f64>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK8 {
     init_epoch: f64,
     tstep: f64,
@@ -381,7 +366,7 @@ pub struct SPK8 {
     degree: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK9 {
     epochs: Vec<f64>,
     rx_coefficients: Vec<Vec<f64>>,
@@ -393,57 +378,57 @@ pub struct SPK9 {
     degree: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK10 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK12 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK13 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK14 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK15 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK17 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK18 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK19 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK20 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPK21 {
     data: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SPKSegment {
     name: String,
     initial_epoch: f64,
@@ -474,7 +459,7 @@ impl SPKSegment {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct CKSegment {
     name: String,
     initial_sclk: f64,
@@ -504,7 +489,7 @@ impl CKSegment {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BPCKSegment {
     name: String,
     initial_epoch: f64,
@@ -531,18 +516,42 @@ impl BPCKSegment {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum DAFSegment {
     SPK(SPKSegment),
     CK(CKSegment),
     BPCK(BPCKSegment),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct DAFHeader {
     name: String,
     comment: String,
     kind: String,
 }
 
+#[derive(Debug, Serialize)]
+pub struct DAFData {
+    header: DAFHeader,
+    segments: Vec<DAFSegment>
+}
+
+impl DAFData {
+    pub fn from_daffile(df: &mut DAFFile) -> Result<DAFData> {
+        let header: DAFHeader = df.daf_header()?;
+        let mut segments: Vec<DAFSegment> = Vec::new();
+
+        for seg in df {
+            match seg {
+                Ok(s) => {segments.push(s);},
+                Err(e) => {return Err(e);},
+            }
+        }
+
+        Ok(DAFData {
+            header,
+            segments,
+        })
+    }
+}
 // TODO: add asserts to verify file data

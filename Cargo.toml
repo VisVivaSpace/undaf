@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = "4.4.12"
+ron = "0.8.1"
+serde = { version = "1", features = ["derive"] }
 thiserror = "1.0.56"

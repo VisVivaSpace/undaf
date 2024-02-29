@@ -7,9 +7,10 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 // Dependancies
 
+#[doc(hidden)]
+pub use serde::Serialize;
 pub use clap::{value_parser, Arg, Command};
 pub use std::fs::File;
-#[doc(hidden)]
 pub use std::io;
 pub use std::io::prelude::*;
 pub use std::io::Read;

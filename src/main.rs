@@ -2,7 +2,7 @@
 
 use crate::prelude::*;
 
-use undaf::DAFFile;
+use undaf::{DAFData, DAFFile, DAFHeader, DAFSegment};
 
 mod error;
 mod prelude;
@@ -35,14 +35,12 @@ fn main() -> std::io::Result<()> {
         .get_many::<PathBuf>("input")
         .expect("Must specify input file(s).")
     {
-        dbg!(infile);
 
         match DAFFile::from_file(File::open(&infile)?) {
             Err(why) => panic!("couldn't open {}: {}", infile.to_str().unwrap(), why),
             Ok(mut daf) => {
-                dbg!(daf.daf_header());
-                dbg!(daf.next());
-                dbg!(daf.next());
+                let data = DAFData::from_daffile(&mut daf).unwrap();
+                println!("{}",ron::to_string(&data).unwrap());
             }
         }
     }
