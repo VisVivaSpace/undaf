@@ -43,7 +43,7 @@ fn get_char(mut f: &File, offset: u64) -> Result<char> {
     if buf[0].is_ascii() {
         return Ok(buf[0] as char);
     } else {
-        return Err(Error::Generic(String::from("Non-ASCII value read")));
+        return Err(anyhow!("Non-ASCII value read"));
     };
 }
 
@@ -72,7 +72,7 @@ fn get_string(mut f: &File, offset: u64, maxlen: u64) -> Result<String> {
                 break; // if b none, end of string
             }
             Some(Err(error)) => {
-                return Err(Error::IO(error));
+                return Err(anyhow!(error));
             }
             Some(Ok(0u8)) => {
                 // if \0, skip
@@ -107,9 +107,7 @@ impl Endian {
         match get_char(f, 88)? {
             'B' | 'b' => Ok(Endian::Big),
             'L' | 'l' => Ok(Endian::Little),
-            _ => Err(Error::Generic(String::from(
-                "Unable to determine DAF file endian-ness",
-            ))),
+            _ => Err(anyhow!("Unable to determine DAF file endian-ness")),
         }
     }
 }
@@ -189,7 +187,7 @@ impl DAFFile {
             'C' => CKSegment::reader,
             'P' => BPCKSegment::reader,
             _ => {
-                return Err(Error::Generic(String::from("Unsuported DAF file type")));
+                return Err(anyhow!("Unsuported DAF file type"));
             }
         };
 

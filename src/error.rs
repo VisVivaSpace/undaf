@@ -2,8 +2,7 @@
 
 
 #[derive(thiserror::Error, Debug)]
-
-pub enum Error {
+pub enum DAFError {
     #[error("Generic {0}")]
     Generic(String), //TODO remove later
 
