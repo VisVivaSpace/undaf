@@ -289,7 +289,7 @@ impl DAFFile {
     }
 
     fn advance_segment(&mut self) -> Option<Result<u64>> {
-        if self.current_segment < self.nsum {
+        if (self.current_segment + 1) < self.nsum {
             self.current_segment = self.current_segment + 1;
             return Some(Ok(self.current_ptr()));
         } else {
@@ -531,7 +531,7 @@ pub struct DAFHeader {
 #[derive(Debug, Serialize)]
 pub struct DAFData {
     header: DAFHeader,
-    segments: Vec<DAFSegment>
+    segments: Vec<DAFSegment>,
 }
 
 impl DAFData {
@@ -541,15 +541,16 @@ impl DAFData {
 
         for seg in df {
             match seg {
-                Ok(s) => {segments.push(s);},
-                Err(e) => {return Err(e);},
+                Ok(s) => {
+                    segments.push(s);
+                }
+                Err(e) => {
+                    return Err(e);
+                }
             }
         }
 
-        Ok(DAFData {
-            header,
-            segments,
-        })
+        Ok(DAFData { header, segments })
     }
 }
 // TODO: add asserts to verify file data
