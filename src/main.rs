@@ -60,6 +60,20 @@ fn main() -> std::io::Result<()> {
                 Err(e) => Err(anyhow!(e))
             }
         },
+        "json" => |mut daf: DAFFile| -> Result<String> {
+            let data = DAFData::from_daffile(&mut daf).unwrap();
+            match serde_json::to_string_pretty(&data) {
+                Ok(s) => Ok(s),
+                Err(e) => Err(anyhow!(e))
+            }
+        },
+        "toml" => |mut daf: DAFFile| -> Result<String> {
+            let data = DAFData::from_daffile(&mut daf).unwrap();
+            match toml::ser::to_string_pretty(&data) {
+                Ok(s) => Ok(s),
+                Err(e) => Err(anyhow!(e))
+            }
+        },
         _ => {panic!("Unsuported output file extension: {}",extension)}
     };
 
@@ -73,7 +87,7 @@ fn main() -> std::io::Result<()> {
             Ok(mut daf) => {
                 //let data = DAFData::from_daffile(&mut daf).unwrap();
                 //println!("{}",ron::to_string(&data).unwrap());
-                println!("{}",writer(daf).unwrap());
+                write!(output,"{}",writer(daf).unwrap());
             }
         }
     }
